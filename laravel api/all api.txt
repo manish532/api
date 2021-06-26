@@ -1,0 +1,185 @@
+ 
+
+Note : - you have to create modal and migration for make any type of api;
+
+config - route service provider   //use Illuminate\Database\Schema\Builder;
+       
+       - app service provider  // Builder::defaultStringLength(191);
+----------------------------------------------------------------------------------
+
+Get Api 
+----------------------------------------------------------------------------------
+
+step 1 => First make controller   
+path => app/http/controller/actions
+----------------------------------------------------------------------------------
+<?php
+
+namespace App\Http\Controllers;
+use App\Models\Demo;
+use Illuminate\Http\Request;
+
+class action extends Controller
+{
+   public function fetch_demo(){
+
+   $res = Demo::all();
+   
+   if($res){  
+      return $res;
+   }
+   else{   
+       return "data not avilable!";
+   }
+ } 
+}
+
+***********************************************************************************
+Step 2  => declare route  
+
+path => route/api.php
+-----------------------------------------------------------------------------------
+
+Route::get('data','action@fetch_demo');
+
+**********************************************************************************
+**********************************************************************************
+
+
+Post Api 
+----------------------------------------------------------------------------------
+
+step 1 => First make controller   
+path => app/http/controller/actions
+----------------------------------------------------------------------------------
+<?php
+
+namespace App\Http\Controllers;
+use App\Models\Demo;
+use Illuminate\Http\Request;
+
+class action extends Controller
+{
+   public function store_demo(Request $data){
+
+   $res = Demo::create($data->all());
+   
+   if($res){  
+      return "data is stored";
+   }
+   else{   
+       return "data is not stored! ";
+   }
+
+ }
+
+}
+
+***********************************************************************************
+Step 2  => declare route  
+
+path => route/api.php
+-----------------------------------------------------------------------------------
+
+Route::post('data','action@store_demo');
+
+**********************************************************************************
+**********************************************************************************
+
+
+
+PUT API      //put api is used for update the data
+***********************************************************************************
+
+Step 1=> First make controller   
+---------------------------------------------------------------------------------- 
+
+path => app/http/controller/actions
+------------------------------------
+
+<?php
+
+namespace App\Http\Controllers;
+use App\Models\Detail;
+use Illuminate\Http\Request;
+
+class actions extends Controller
+{
+    public function updatedata(Request $alldetails){
+   
+     $rowdata = Detail::find($alldetails->id);
+     
+     $rowdata->name = $alldetails->name;
+     $rowdata->company = $alldetails->company;
+     $rowdata->color = $alldetails->color;
+     $rowdata->address = $alldetails->address;
+     $response = $rowdata->save();
+     if($response){
+
+      return "data updated";
+
+     }
+     else{
+
+      return "data not updated";
+
+     }
+  }
+}
+
+***********************************************************************************
+
+Step 2  => declare route  
+
+path => route/api.php
+-----------------------------------------------------------------------------------
+
+Route::put('res','actions@updatedata');
+
+
+***********************************************************************************
+***********************************************************************************
+
+Delete Api 
+----------------------------------------------------------------------------------
+
+step 1 => First make controller    
+path => app/http/controller/actions
+----------------------------------------------------------------------------------
+
+<?php
+
+namespace App\Http\Controllers;
+use App\Models\Demo;
+use Illuminate\Http\Request;
+
+class action extends Controller
+{
+    public function delete_demo($id){
+
+    $res = Demo::find($id);
+
+    $deleted = $res->delete();
+
+    if($deleted){
+           return "data is deleted";
+    }
+    else{
+        return "data is deleted";
+
+    }
+
+  }
+}
+***********************************************************************************
+Step 2  => declare route  
+
+path => route/api.php
+-----------------------------------------------------------------------------------
+
+Route::delete('data/{id}','action@delete_demo');
+
+************************************************************************************
+************************************************************************************
+
+

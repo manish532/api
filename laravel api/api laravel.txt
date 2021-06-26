@@ -1,0 +1,85 @@
+api
+--------------------------------------------------------------------------------------------------------------
+config service provider
+-------------------------
+protected $namespace = 'App\\Http\\Controllers';
+
+--------------------------------------------------------------------------------------------------------------
+route
+------------------------------------------------------------------------
+<?php
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| is assigned the "api" middleware group. Enjoy building your API!
+|
+*/
+
+Route::middleware('auth:api')->get('/user', function (Request $request) {
+    return $request->user();
+});
+
+Route::get("/firstapi","apicontroller@fetchdata");
+Route::get("/productlist","apicontroller@productlist");
+
+-------------------------------------------------------------------------------------------------------------
+
+=> controller
+----------------------
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
+
+class apicontroller extends Controller
+{
+    public $data;
+    public $db;
+    public $other;
+    // public function __construct(){
+    //     $this->middleware("auth:api");
+    // }
+    public function fetchdata(){
+         
+        $data = "heloworld";
+        return response(array("status"=>true,"message"=>"my first api access","data"=>$data),200)->header("Content-Type","application/json");
+    }
+
+// start fetch all product list
+    public function productlist(){       
+        try{
+            $this->data = Product::select('product')->get();
+            if(count($this->data) != 0){
+            return response(array("status"=>true,"message"=>"my first api access","data"=>$this->data),200)->header("Content-Type","application/json");
+            }
+            else{
+            return response(array("status"=>false,"message"=>"no product in database","data"=>$data),200)->header("Content-Type","application/json");
+
+            }
+        }
+        catch(QueryException $error){
+        return response(array("status"=>false,"message"=>" Opps! technical error accured.","data"=>""),500)->header("Content-Type","application/json");
+        }
+    
+    }
+// end fetch all product list
+
+    public function __destruct(){
+        unset($this->data);
+        unset($this->db);
+        unset($this->other);
+    }
+}
+------------------------------------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,142 @@
+
+API
+*****************************************************************************************
+
+ 1. => GET API
+*****************************************************************************************
+
+<?php
+class variables{
+    protected $db;
+    protected $http;
+    protected $sql;
+    protected $response;
+    protected $all_data = [];
+} 
+class api extends variables{
+    function __construct(){
+        $this->db = new mysqli("localhost","root","","customers");
+       $this->http  = $_SERVER['REQUEST_METHOD'];
+       if($this->http == "GET"){
+        $this ->get_data();
+       }
+    }
+    function get_data(){
+        $this->sql = "SELECT * FROM cus_list";
+        $this->response = $this->db->query($this->sql);
+        if($this->response->num_rows != 0){
+        while($this->data = $this->response->fetch_assoc()){
+              array_push($this->all_data, $this->data);
+        }
+        http_response_code(200);
+        echo json_encode($this->all_data);
+    }
+    else{
+        http_response_code(404);
+        echo json_encode(array("message" =>"data not found"));
+    }
+    }
+}
+new api();
+?>
+ 
+*****************************************************************************************
+
+ 2. => POST API 
+*****************************************************************************************
+
+<?php
+class props{
+    protected $db;
+    protected $http;
+    protected $column = ['Name','Email','Number','Age'];
+    protected $sql;
+    protected $res;
+
+}
+class insert extends props{
+    function __construct(){
+       $this->db = new mysqli("localhost","root","","customers");
+       $this->http = $_SERVER['REQUEST_METHOD'];
+       if($this->http == "POST"){
+        $this->insertData();  
+    }    
+}
+function insertData(){
+    $count=0;
+    foreach($this->column as $result)
+    {
+        if(array_key_exists($result,$_POST))
+        {
+            $count++;
+        }
+    }
+   if($count==4){
+      $name = $_POST['Name'];
+      $email =$_POST['Email'];
+      $number = $_POST['Number'];
+      $age = $_POST['Age'];
+      $this->sql = "INSERT INTO cus_list(Name,Email,Number,Age)VALUES('$name','$email','$number','$age')";
+      $this->res = $this->db->query($this->sql);
+     
+        if($this->res == true){
+            http_response_code(200);
+            echo json_encode(array("message" => "your data is successfully inserted thank !"));
+        }
+        else{
+            http_response_code(420);
+            echo json_encode(array("message" => "sorry try again !"));
+        }
+   }
+   else{
+       http_response_code(500);
+       echo json_encode(array("message" => "somthig wrong"));
+   }
+    
+}
+}
+new insert();
+?>
+**************************************************************************************************************
+
+ 3. => DELETE
+**************************************************************************************************************
+
+<?php
+
+class props{
+    protected $db;
+    protected $http;
+    protected $sql;
+}
+class insert extends props{
+    function __construct(){
+       $this->db = new mysqli("localhost","root","","customers");
+       $this->http = $_SERVER['REQUEST_METHOD'];   
+    if($this->http == "DELETE"){
+    $this->deleteData();
+    }  
+}
+function deleteData(){
+    if(isset($_GET['id'])){
+        $this->sql = "DELETE from cus_list where id =".$_GET['id'];
+        $this->db->query($this->sql);
+        if($this->db->affected_rows !=0)
+        {
+         http_response_code(200);
+         echo json_encode(array("status" => "Data successfully deleted thanks !"));
+        }
+        else{
+         http_response_code(500);
+         echo json_encode(array("status" => "unable to delete or data is not avilable"));   
+        }
+    }
+    else{
+        http_response_code(500);
+        echo json_encode(array("status" => "something wrong"));
+    }
+}
+}
+new insert();
+?>
+**************************************************************************************************************
